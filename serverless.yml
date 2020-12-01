@@ -1,0 +1,79 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: S3PreSignedUrlFileUpload
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  profile: serverlessUser
+  region: us-east-1
+  environment:
+      tableName: ${self:custom.tableName}
+      bucketName: ${self:custom.bucketName}
+  iamRoleStatements:
+      - Effect: Allow
+        Action:
+            - dynamodb:*
+            - s3:*
+        Resource: '*'
+
+custom:
+  tableName: files-references
+  bucketName: s3-presigned-url-file-upload-01
+  s3Sync:
+    - bucketName: ${self:custom.bucketName}
+      localDir: UploadData
+
+functions:
+  getFiles:
+    handler: src/lambdas/getFiles.handler
+    events:
+        - http:
+            path: documents/
+            method: GET
+            cors: true
+  getFileById:
+    handler: src/lambdas/getFileById.handler
+    events:
+        - http:
+            path: documents/{ID}
+            method: GET
+            cors: true
+  createFile:
+    handler: src/lambdas/createFile.handler
+    events:
+        - http:
+            path: documents/
+            method: POST
+            cors: true
+
+resources:
+    Resources:
+        UploadFilesBucket:
+            Type: AWS::S3::Bucket
+            Properties:
+                BucketName: ${self:custom.bucketName}
+        DynamoDbFilesTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: ${self:custom.tableName}
+                AttributeDefinitions:
+                    - AttributeName: ID
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: ID
+                      KeyType: HASH
+                BillingMode: PAY_PER_REQUEST
