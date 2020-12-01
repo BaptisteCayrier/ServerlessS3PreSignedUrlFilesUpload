@@ -1,6 +1,12 @@
 # SimpleS3PreSignedUrlFilesUpload
 This project a simple usage example of S3 pre-signed url to upload file with a DynamoDB files referencing.
 
+## API
+- GET /documents List all files
+- POST /documents Give a pre-signed S3 url
+- GET /documents/:uuid Get a file by id
+
+
 ## Get started
 
 To install serverless-cli globally, please execute the following command from your terminal.
@@ -15,7 +21,7 @@ To run this app you will have to install the dependencies first.
 npm install
 ```
 
-And then you just have to execute the deployement.
+And then you have to deploy.
 ```shell
 sls deploy
 ```
